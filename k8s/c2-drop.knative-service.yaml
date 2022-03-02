@@ -1,0 +1,65 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: c2-drop
+  labels:
+    serving.knative.dev/visibility: cluster-local
+spec:
+  template:
+    spec:
+      serviceAccountName: c2-drop
+      containers:
+        #- image: docker.io/n3wscott/drop:v0.1.0@sha256:bec3a7f2cf2fcbccb7a595cbb9263c7ed8a7f43ec57857c8e32083bb4665bc51
+        - image: mycustomreg.my.domain.net:5000/TODO
+          env:
+            - name: NAMESPACE
+              value: default
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: c2-drop
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: c2-drop
+rules:
+  # Sources read
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: c2-drop
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: c2-drop
+subjects:
+  - kind: ServiceAccount
+    name: c2-drop
+    namespace: default
+
+---
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: c2-drop
+  namespace: default
+spec:
+  broker: default
+  filter:
+    attributes:
+      source: falco.org
+      type: falco.rule.output.v1
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: c2-drop
+
+---
