@@ -9,7 +9,10 @@ Inspired by:
 **BUILD IS FAILING** See below.
 
 
-See this issue: https://github.com/n3wscott/falco-drop/issues/3
+See these issues:
+
+* https://github.com/knative/pkg/issues/2452
+* https://github.com/n3wscott/falco-drop/issues/3
 
 I copy/paste the issue here below.
 
