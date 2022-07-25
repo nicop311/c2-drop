@@ -21,6 +21,7 @@ endif
 all: build
 
 build:
+	$(GOCMD) mod vendor
 	@$(GODEBUGFLAGS) $(GOBUILD) -v -o $(BINARY_NAME) $(APP_MAIN_PATH)
 
 clean:
