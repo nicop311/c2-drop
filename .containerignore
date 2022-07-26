@@ -1,7 +1,2 @@
 .cache/
 .git/
-.pyc
-.pyo
-__pycache__
-test
-tests
