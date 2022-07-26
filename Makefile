@@ -9,6 +9,7 @@ GOCLEAN=$(GOCMD) clean
 # App parameters
 NAME := c2-drop
 APP_MAIN_PATH := ./cmd/$(NAME)
+BINARY_FOLDER := ./bin
 BINARY_NAME := falco-$(NAME).so
 
 # Go debug
