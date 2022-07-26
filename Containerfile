@@ -1,5 +1,7 @@
 # This is a Containerfile/Dockerfile
 #==============================================================================#
+# Build me localy:
+# $ podman build -f Containerfile -t localhost/c2-drop:latest
 #==============================================================================#
 
 # Go version
@@ -15,20 +17,28 @@ ARG FINAL_IMAGE=alpine
 ARG FINAL_IMAGE_TAG=3.15
 
 #==============================================================================#
-# Building the Go Knative application
+# Setup the Go builder image
 #==============================================================================#
-FROM ${BUILDER_REGISTRY}/${BUILDER_IMAGE}:${BUILDER_IMAGE_TAG} AS gobuilder
+FROM ${BUILDER_REGISTRY}/${BUILDER_IMAGE}:${BUILDER_IMAGE_TAG} AS gosetup
 
 ENV CGO_ENABLED=0
 
-RUN mkdir -p /opt/knative/c2-drop/bin
-
 WORKDIR /opt/knative/c2-drop
-COPY . .
+COPY cmd cmd
+COPY go.mod .
+COPY go.sum .
 
 RUN go mod vendor
-RUN go build -v -o /opt/knative/c2-drop/bin/c2-drop  cmd/c2-drop/main.go
 
+#==============================================================================#
+# Building the Go Knative application
+#==============================================================================#
+FROM gosetup AS gobuilder
+
+RUN mkdir -p /opt/knative/c2-drop/bin
+WORKDIR /opt/knative/c2-drop
+
+RUN go build -v -o /opt/knative/c2-drop/bin/c2-drop  cmd/c2-drop/main.go
 
 #==============================================================================#
 # Final image
